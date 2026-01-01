@@ -75,4 +75,12 @@ o.termguicolors = true
 o.list = true
 o.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
+-- Highlighting
+o.hlsearch = true   -- Highlight on search
 
+-- Small highlight when yanking
+vim.api.nvim_create_autocmd("TextYankPost", {
+    callback = function()
+        vim.highlight.on_yank()
+    end,
+})

@@ -8,12 +8,13 @@ wk({
 
     -- Window controls
     { "<leader>w", desc = "Window" },
-    { "<leader>wl", "<cmd>vs_f<CR>", noremap = true, desc = "RIGHT Split" },
-    { "<leader>wj", "<cmd>sp_f<CR>", noremap = true, desc = "DOWN Split" },
+    { "<leader>wl", "<cmd>vs<CR>", noremap = true, desc = "RIGHT Split" },
+    { "<leader>wj", "<cmd>sp<CR>", noremap = true, desc = "DOWN Split" },
     { "<leader>wH", "<C-w>h", noremap = true, desc = "Move to LEFT Window" },
     { "<leader>wJ", "<C-w>j", noremap = true, desc = "Move to DOWN Window" },
     { "<leader>wK", "<C-w>k", noremap = true, desc = "Move to UP Window" },
     { "<leader>wL", "<C-w>l", noremap = true, desc = "Move to RIGHT Window" },
+    { "<leader>wq", "<cmd>clo<CR>", noremap = true, desc = "Close current window" },
 
     -- Quitting Windows
     { "<leader>qq", "<cmd>wq<CR>", noremap = true, desc = "Quit" },

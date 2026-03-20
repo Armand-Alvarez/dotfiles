@@ -55,4 +55,5 @@ wk({
 wk({
     { "<leader>T", group = "Terminal"},
     { "<leader>Tt", "<cmd>ToggleTerm<CR>", desc = "Toggle" },
+    { "<Esc>", "<C-\\><C-n>", desc = "Exit terminal-mode", mode= {"t" }}
 })

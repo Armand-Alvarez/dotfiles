@@ -26,6 +26,9 @@
   - [[#table-of-contents][Table of Contents]]
   - [[#org-bullets][Org bullets]]
   - [[#source-code-block-tag-expansion][Source Code Block Tag Expansion]]
+- [[#shell][Shell]]
+  - [[#eshell][Eshell]]
+  - [[#vterm][Vterm]]
 
 * Package Management
 
@@ -235,9 +238,12 @@ General makes it easier to set keybindings
       "er" '(eval-region :wk "Evaluate elisp in region")) 
 
     (char/leader-keys
-      "t" '(:ignore t :wk "Toggle")
-      "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
-      )
+      "T" '(:ignore t :wk "Toggle")
+      "T l" '(display-line-numbers-mode :wk "Toggle line numbers"))
+
+    (char/leader-keys
+      "t" '(:ignore t :wk "Terminal")
+      "tt" '(vterm-toggle :wk "toggle vterm"))
     
     (char/leader-keys
       "w" '(:ignore t :wk "Windows")
@@ -421,3 +427,68 @@ Org-tempo is not a separate package but a module within org that can be enabled.
   (require 'org-tempo)
 #+end_src
 
+
+* Shell
+
+** Eshell
+
+A command shell for Emacs
+
+#+begin_src emacs-lisp
+  (use-package eshell-syntax-highlighting
+    :after esh-mode
+    :ensure t
+    :config
+    (eshell-syntax-highlighting-global-mode +1))
+
+  ;; eshell-syntax-highlighting -- adds fish/zsh-like syntax highlighting.
+  ;; eshell-rc-script -- your profile for eshell; like a bashrc for eshell.
+  ;; eshell-aliases-file -- sets an aliases file for the eshell.
+    
+  (setq eshell-rc-script (concat user-emacs-directory "eshell/profile")
+        eshell-aliases-file (concat user-emacs-directory "eshell/aliases")
+        eshell-history-size 5000
+        eshell-buffer-maximum-lines 5000
+        eshell-hist-ignoredups t
+        eshell-scroll-to-bottom-on-input t
+        eshell-destroy-buffer-when-process-dies t
+        eshell-visual-commands'("bash" "fish" "htop" "ssh" "top" "zsh"))
+#+end_src
+
+** Vterm
+
+Terminal emulation in Emacs
+
+#+begin_src emacs-lisp
+  (use-package vterm
+    :ensure t
+    :config
+    (setq shell-file-name "/bin/kitty"
+  	vterm-max-scrollback 5000))
+#+end_src
+
+*** Vterm toggle
+
+Vterm-Toggle
+vterm-toggle toggles between the vterm buffer and whatever buffer you are editing.
+#+begin_src emacs-lisp
+  (use-package vterm-toggle
+    :after vterm
+    :ensure t
+    :config
+    (setq vterm-toggle-fullscreen-p nil)
+    (setq vterm-toggle-scope 'project)
+    (add-to-list 'display-buffer-alist
+                 '((lambda (buffer-or-name _)
+                     (let ((buffer (get-buffer buffer-or-name)))
+                       (with-current-buffer buffer
+                         (or (equal major-mode 'vterm-mode)
+                             (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
+                   (display-buffer-reuse-window display-buffer-at-bottom)
+                   ;;(display-buffer-reuse-window display-buffer-in-direction)
+                   ;;display-buffer-in-direction/direction/dedicated is added in emacs27
+                   ;;(direction . bottom)
+                   ;;(dedicated . t) ;dedicated is supported in emacs27
+                   (reusable-frames . visible)
+                   (window-height . 0.3))))
+#+end_src

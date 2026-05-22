@@ -363,17 +363,17 @@ Disable backup files - since anything important I track with version control sys
 #+begin_src emacs-lisp
   (setq which-key-allow-evil-operators t ;; Enable popups to show for evil operators
         which-key-show-early-on-C-h t ;; Trigger C-h popup before its done automatically
-        which-key-side-window-location 'bottom
+        which-key-side-window-location '(bottom right)
         which-key-sort-order #'which-key-key-order-alpha
         which-key-sort-uppercase-first nil
         which-key-add-column-padding 1
         which-key-max-display-columns nil
         which-key-min-display-lines 6
         which-key-side-window-slot -10
-        which-key-side-window-max-height 0.25
+        which-key-side-window-max-height 0.35
         which-key-idle-delay 0.8
         which-key-max-description-length 25
-        which-key-allow-imprecise-window-fit t
+        which-key-allow-imprecise-window-fit nil
         which-key-separator " → " 
         which-key-idle-secondary-delay 0.05)
   (which-key-mode)

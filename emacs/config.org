@@ -248,10 +248,13 @@ General makes it easier to set keybindings
     (char/leader-keys
       "w" '(:ignore t :wk "Windows")
       ;; Window splits
-      "w c" '(evil-window-delete :wk "Close window")
+      "w q" '(evil-window-delete :wk "Close window")
+      "w Q" '(delete-other-windows :wk "Delete other windows")
       "w n" '(evil-window-new :wk "New window")
       "w s" '(evil-window-split :wk "Horizontal split window")
       "w v" '(evil-window-vsplit :wk "Vertical split window")
+      "w i" '((lambda () (interactive) (enlarge-window 70) (enlarge-window-horizontally 70)) :wk "Enlarge window")
+      "w I" '(balance-windows :wk "Balance windows")
       ;; Window motions
       "w h" '(evil-window-left :wk "Window left")
       "w j" '(evil-window-down :wk "Window down")

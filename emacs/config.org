@@ -9,13 +9,14 @@
   - [[#how-to-use-elpaca][How to Use Elpaca]]
 - [[#editing][Editing]]
   - [[#evil][Evil]]
+  - [[#ivy-counsel-swiper][Ivy, Counsel, Swiper]]
   - [[#python-packages][Python Packages]]
   - [[#keybinds][Keybinds]]
 - [[#gui][GUI]]
   - [[#theme][Theme]]
   - [[#line-numbers][Line Numbers]]
   - [[#fonts][Fonts]]
-  - [[#setting-the-font-face][Setting the Font Face]]
+  - [[#all-the-icons][All the icons]]
 - [[#file-management][File Management]]
   - [[#backups][Backups]]
 - [[#help][Help]]
@@ -297,10 +298,22 @@ Relative line numbers, duh
   ;; are not right unless I also add this method of setting the default font.
   (add-to-list 'default-frame-alist '(font . "JetBrains Mono-11"))
 
-  (setq-default line-spacing 0.22)
+  (setq-default line-spacing 0.17)
 
 #+end_src
 
+** All the icons
+
+Gives a bunch of icons to use in emacs
+
+#+begin_src emacs-lisp
+  (use-package all-the-icons
+    :ensure t
+    :if (display-graphic-p))
+
+  (use-package all-the-icons-dired
+    :ensure t
+    :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
 #+end_src
 
 * File Management

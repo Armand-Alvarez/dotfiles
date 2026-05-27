@@ -238,11 +238,17 @@ General makes it easier to set keybindings
       "bp" '(previous-buffer :wk "Previous buffer")
       "br" '(revert-buffer :wk "Reload buffer")
       "bm" '(buffer-menu :wk "Buffer menu"))
-    
+
+    (char/leader-keys
+      "SPC" '(counsel-M-x :wk "Counsel M-x")
+      "TAB TAB" '(comment-line :wk "Comment lines"))
+
     (char/leader-keys
       "f"  '(:ignore t :wk "file")
-      "ff" '(find-file :wk "Find file"))
-    
+      "ff" '(find-file :wk "Find file")
+      "fc" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
+      "fr" '(counsel-recentf :wk "Find recent files"))
+
     (char/leader-keys
       "h"   '(:ignore t :wk "help")
       "hh"  '(help-for-help :wk "Help for help")
@@ -252,10 +258,24 @@ General makes it easier to set keybindings
       "hk"  '(describe-key :wk "Describe key")
       "hc"  '(describe-key-briefly :wk "Describe key briefly")
       "ho"  '(describe-symbol :wk "Describe symbol")
-      "hC"  '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
       "hrr" '(reload-init-file :wk "Reload emacs config"))
-    
-    
+
+    (char/leader-keys
+      "m" '(:ignore t :wk "Org")
+      "m a" '(org-agenda :wk "Org agenda")
+      "m e" '(org-export-dispatch :wk "Org export dispatch")
+      "m i" '(org-toggle-item :wk "Org toggle item")
+      "m t" '(org-todo :wk "Org todo")
+      "m B" '(org-babel-tangle :wk "Org babel tangle")
+      "m T" '(org-todo-list :wk "Org todo list")
+      ;; Tables
+      "m b" '(:ignore t :wk "Tables")
+      "m b -" '(org-table-insert-hline :wk "Insert hline in table")
+      ;; Dates
+      "m d" '(:ignore t :wk "Date/deadline")
+      "m d t" '(org-time-stamp :wk "Org time stamp"))
+
+
     (char/leader-keys
       "e"  '(:ignore t :wk "Evaluate")    
       "eb" '(eval-buffer :wk "Evaluate elisp in buffer")
@@ -265,13 +285,10 @@ General makes it easier to set keybindings
       "er" '(eval-region :wk "Evaluate elisp in region")) 
 
     (char/leader-keys
-      "T" '(:ignore t :wk "Toggle")
-      "T l" '(display-line-numbers-mode :wk "Toggle line numbers"))
-
-    (char/leader-keys
-      "t" '(:ignore t :wk "Terminal")
+      "t" '(:ignore t :wk "Toggle")
+      "tl" '(display-line-numbers-mode :wk "Toggle line numbers")
       "tt" '(vterm-toggle :wk "toggle vterm"))
-    
+
     (char/leader-keys
       "w" '(:ignore t :wk "Windows")
       ;; Window splits

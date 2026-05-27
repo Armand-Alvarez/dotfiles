@@ -328,7 +328,6 @@ Catppuccin theme because its cute
 Relative line numbers, duh
 
 #+begin_src emacs-lisp
-  (setq display-line-numbers 'relative)
   (global-display-line-numbers-mode t)
 #+end_src
 

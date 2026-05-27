@@ -9,3 +9,10 @@
 (menu-bar-mode 0)
 (tool-bar-mode 0)
 (scroll-bar-mode 0)
+
+;; Relative line numbers
+(setq display-line-numbers 'relative)
+
+
+;; Display project in mode line
+(setq project-mode-line t)

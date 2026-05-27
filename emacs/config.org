@@ -9,6 +9,7 @@
   - [[#how-to-use-elpaca][How to Use Elpaca]]
 - [[#editing][Editing]]
   - [[#evil][Evil]]
+  - [[#company][Company]]
   - [[#ivy-counsel-swiper][Ivy, Counsel, Swiper]]
   - [[#python-packages][Python Packages]]
   - [[#keybinds][Keybinds]]
@@ -128,9 +129,33 @@
     (evil-collection-init))
 #+end_src
 
+** Company
+
+Text completion
+
+#+begin_src emacs-lisp
+  (use-package company
+    :defer 2
+    :diminish
+    :custom
+    (company-begin-commands '(self-insert-command))
+    (company-idle-delay .1)
+    (company-minimum-prefix-length 2)
+    (company-show-numbers t)
+    (company-tooltip-align-annotations 't)
+    (global-company-mode t))
+
+  (use-package company-box
+    :after company
+    :ensure t
+    :diminish
+    :hook (company-mode . company-box-mode))
+
+#+end_src
+
 ** Ivy, Counsel, Swiper
 
-Ivy is a generic completion mechanism for Emacs
+Ivy is a generic completion mechanism for Emacs in the minbuffer (which-key)
 Counsel is a collection of Ivy-enhanced versions of common Emacs commands
 Swiper is an Ivy-enhanced alternative to Isearch
 

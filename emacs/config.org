@@ -30,6 +30,7 @@
 - [[#shell][Shell]]
   - [[#eshell][Eshell]]
   - [[#vterm][Vterm]]
+- [[#dashboard][Dashboard]]
 
 * Package Management
 
@@ -519,4 +520,35 @@ vterm-toggle toggles between the vterm buffer and whatever buffer you are editin
                    ;;(dedicated . t) ;dedicated is supported in emacs27
                    (reusable-frames . visible)
                    (window-height . 0.3))))
+#+end_src
+
+* Dashboard
+
+Extensible Emacs startup screen
+
+#+begin_src emacs-lisp
+  (use-package dashboard
+    :ensure t 
+    :init
+    (setq initial-buffer-choice 'dashboard-open)
+    (setq dashboard-set-heading-icons t)
+    (setq dashboard-set-file-icons t)
+    (setq dashboard-banner-logo-title "Welcome to Emacs, Charlotte!")
+    (setq dashboard-center-content t) ;; set to 't' for centered content
+    (setq dashboard-items '((recents . 5)
+                            (agenda . 5 )
+                            (bookmarks . 3)
+                            (projects . 3)
+                            (registers . 3)))
+    (setq dashboard-item-shortcuts '((recents    . "r")
+  				   (bookmarks  . "b")
+  				   (projects   . "p")
+  				   (agenda     . "a")
+  				   (registers  . "e")))
+    (setq dashboard-icon-type 'all-the-icons)
+    :custom
+    (dashboard-modify-heading-icons '((recents . "file-text")
+                                      (bookmarks . "book")))
+    :config
+    (dashboard-setup-startup-hook))
 #+end_src

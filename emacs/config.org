@@ -3,15 +3,16 @@
 #+OPTIONS: toc:2
 
 * TABLE OF CONTENTS :toc:
-- [[#package-management][Package Management]]
-  - [[#elpaca][Elpaca]]
+- [[#important-programs-to-load-first][Important Programs to Load First]]
+  - [[#add-scripts-dir-to-path][Add scripts dir to path]]
+  - [[#sourcing-the-scripts][Sourcing the scripts]]
   - [[#use-package-support][Use-package Support]]
-  - [[#how-to-use-elpaca][How to Use Elpaca]]
 - [[#editing][Editing]]
   - [[#evil][Evil]]
   - [[#company][Company]]
   - [[#ivy-counsel-swiper][Ivy, Counsel, Swiper]]
   - [[#python-packages][Python Packages]]
+  - [[#dired][DIRED]]
   - [[#flycheck][Flycheck]]
   - [[#projectile][Projectile]]
   - [[#keybinds][Keybinds]]
@@ -26,8 +27,10 @@
 - [[#help][Help]]
   - [[#which-key][Which Key]]
 - [[#reload-emacs][Reload Emacs]]
+- [[#neotree][NEOTREE]]
 - [[#org-mode][Org Mode]]
   - [[#table-of-contents][Table of Contents]]
+  - [[#agenda-files][Agenda Files]]
   - [[#org-bullets][Org bullets]]
   - [[#source-code-block-tag-expansion][Source Code Block Tag Expansion]]
 - [[#shell][Shell]]
@@ -213,6 +216,36 @@ Install ~elpy~ - the Emacs Python Development Environment
     (elpy-enable))
 #+end_src
 
+** DIRED
+
+Directory Editor
+
+#+begin_src emacs-lisp
+    (use-package dired-open
+      :ensure t
+      :config
+      (setq dired-open-extensions '(("gif" . "sxiv")
+                                    ("jpg" . "sxiv")
+                                    ("png" . "sxiv")
+                                    ("mkv" . "mpv")
+                                    ("mp4" . "mpv"))))
+
+  (use-package peep-dired
+    :ensure t
+    :after dired
+    :hook (evil-normalize-keymaps . peep-dired-hook)
+    :config
+    (evil-define-key 'normal dired-mode-map (kbd "h") 'dired-up-directory)
+    (evil-define-key 'normal dired-mode-map (kbd "l") 'dired-open-file) ; use dired-find-file instead if not using dired-open package
+    (evil-define-key 'normal peep-dired-mode-map (kbd "j") 'peep-dired-next-file)
+    (evil-define-key 'normal peep-dired-mode-map (kbd "k") 'peep-dired-prev-file)
+    )
+
+  ;;(add-hook 'peep-dired-hook 'evil-normalize-keymaps)
+
+
+#+end_src
+
 ** Flycheck
 
 Flycheck does syntax checking
@@ -232,7 +265,7 @@ Interacting with projects
   (use-package projectile
     :ensure t
     :init
-    (setq projectile-project-search-path '("~/projects"))
+    (setq projectile-project-search-path '("~/projects/"))
     :config
     (projectile-mode 1))
 #+end_src
@@ -266,12 +299,23 @@ General makes it easier to set keybindings
       "bm" '(buffer-menu :wk "Buffer menu"))
 
     (char/leader-keys
+      "d" '(:ignore t wk "Dired")
+      "dd" '(dired :wk "Open dired")
+      "dj" '(dired-jump :wk "Dired jump to current")
+      "dn" '(neotree-dir :wk "Open directory in neotree")
+      "dp" '(peep-dired :wk "Peep-dired"))
+
+
+    (char/leader-keys
       "!" '(:ignore t :wk "Flycheck")
       "!n" '(flycheck-next-error :wk "Next error")
       "!p" '(flycheck-previous-error :wk "Prev error")
       "!l" '(flycheck-list-errors :wk "List errors")
       "!S" '(flycheck-select-checker :wk "Select checker")
       "!e" '(flycheck-explain-error-at-point :wk "Explain error"))
+
+    (char/leader-keys
+      "p" '(projectile-command-map :wk "Projectile"))
 
     (char/leader-keys
       "SPC" '(counsel-M-x :wk "Counsel M-x")
@@ -321,6 +365,7 @@ General makes it easier to set keybindings
     (char/leader-keys
       "t" '(:ignore t :wk "Toggle")
       "tl" '(display-line-numbers-mode :wk "Toggle line numbers")
+      "tn" '(neotree-toggle :wk "Toggle neotree")
       "tt" '(vterm-toggle :wk "toggle vterm"))
 
     (char/leader-keys
@@ -543,6 +588,33 @@ Disable backup files - since anything important I track with version control sys
     (load-file user-init-file))
 #+end_src
 
+* NEOTREE
+
+Neotree is a file tree viewer
+
+#+begin_src emacs-lisp
+  (use-package neotree
+    :ensure t
+    :config
+    (setq neo-smart-open t
+          neo-show-hidden-files t
+          neo-window-width 55
+          neo-window-fixed-size nil
+          inhibit-compacting-font-caches t
+          projectile-switch-project-action 'neotree-projectile-action) 
+    ;; truncate long file names in neotree
+    (add-hook 'neo-after-create-hook
+              #'(lambda (_)
+  		(with-current-buffer (get-buffer neo-buffer-name)
+                    (setq truncate-lines t)
+                    (setq word-wrap nil)
+                    (make-local-variable 'auto-hscroll-mode)
+                    (setq auto-hscroll-mode nil)))))
+
+  ;; show hidden files
+
+#+end_src
+
 * Org Mode
 
 ** Table of Contents
@@ -552,6 +624,12 @@ Disable backup files - since anything important I track with version control sys
     :ensure t
     :commands toc-org-enable
     :init (add-hook 'org-mode-hook 'toc-org-enable))
+#+end_src
+
+** Agenda Files
+
+#+begin_src emacs-lisp
+  (setq org-agenda-files '("~/.config/emacs" "~/projects/notes/org"))
 #+end_src
 
 ** Org bullets

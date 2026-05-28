@@ -11,6 +11,7 @@
 # Now ignore certain subdirs inside emacs
 emacs/elpaca/
 emacs/eln-cache/
+emacs/projectile-bookmarks.eld
 
 # Ignore emacs backup files
 *~

@@ -12,6 +12,8 @@
   - [[#company][Company]]
   - [[#ivy-counsel-swiper][Ivy, Counsel, Swiper]]
   - [[#python-packages][Python Packages]]
+  - [[#flycheck][Flycheck]]
+  - [[#projectile][Projectile]]
   - [[#keybinds][Keybinds]]
 - [[#gui][GUI]]
   - [[#theme][Theme]]
@@ -211,6 +213,30 @@ Install ~elpy~ - the Emacs Python Development Environment
     (elpy-enable))
 #+end_src
 
+** Flycheck
+
+Flycheck does syntax checking
+
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :init
+    (global-flycheck-mode))
+#+end_src
+
+** Projectile
+
+Interacting with projects
+
+#+begin_src emacs-lisp
+  (use-package projectile
+    :ensure t
+    :init
+    (setq projectile-project-search-path '("~/projects"))
+    :config
+    (projectile-mode 1))
+#+end_src
+
 ** Keybinds
 
 *** General
@@ -238,6 +264,14 @@ General makes it easier to set keybindings
       "bp" '(previous-buffer :wk "Previous buffer")
       "br" '(revert-buffer :wk "Reload buffer")
       "bm" '(buffer-menu :wk "Buffer menu"))
+
+    (char/leader-keys
+      "!" '(:ignore t :wk "Flycheck")
+      "!n" '(flycheck-next-error :wk "Next error")
+      "!p" '(flycheck-previous-error :wk "Prev error")
+      "!l" '(flycheck-list-errors :wk "List errors")
+      "!S" '(flycheck-select-checker :wk "Select checker")
+      "!e" '(flycheck-explain-error-at-point :wk "Explain error"))
 
     (char/leader-keys
       "SPC" '(counsel-M-x :wk "Counsel M-x")

@@ -13,6 +13,7 @@ emacs/elpaca/
 emacs/eln-cache/
 emacs/projectile-bookmarks.eld
 emacs/recentf
+emacs/elpa/
 
 # Ignore emacs backup files
 *~

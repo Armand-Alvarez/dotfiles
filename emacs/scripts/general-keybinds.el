@@ -21,6 +21,14 @@
       "br" '(revert-buffer :wk "Reload buffer")
       "bm" '(buffer-menu :wk "Buffer menu"))
 
+  (char/leader-keys
+    "o" '(:ignore t :wk "Open")
+    "o d" '(dashboard-open :wk "Dashboard")
+    "o e" '(elfeed :wk "Elfeed RSS")
+    "o f" '(make-frame :wk "Open buffer in new frame")
+    "o F" '(select-frame-by-name :wk "Select frame by name"))
+
+
     (char/leader-keys
       "d" '(:ignore t wk "Dired")
       "dd" '(dired :wk "Open dired")
@@ -78,12 +86,12 @@
 
 
     (char/leader-keys
-      "e"  '(:ignore t :wk "Evaluate")    
+      "e"  '(:ignore t :wk "Evaluate")
       "eb" '(eval-buffer :wk "Evaluate elisp in buffer")
       "ed" '(eval-defun :wk "Evaluate defun containing or after point")
       "ee" '(eval-expression :wk "Evaluate an elisp expression")
       "el" '(eval-last-sexp :wk "Evaluate elisp expression before point")
-      "er" '(eval-region :wk "Evaluate elisp in region")) 
+      "er" '(eval-region :wk "Evaluate elisp in region"))
 
     (char/leader-keys
       "t" '(:ignore t :wk "Toggle")

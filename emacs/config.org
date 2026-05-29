@@ -33,6 +33,7 @@
   - [[#eshell][Eshell]]
   - [[#vterm][Vterm]]
 - [[#dashboard][Dashboard]]
+- [[#rss-reader][RSS Reader]]
 
 * Package Management
 
@@ -486,4 +487,26 @@ Extensible Emacs startup screen
                                       (bookmarks . "book")))
     :config
     (dashboard-setup-startup-hook))
+#+end_src
+
+
+* RSS Reader
+
+#+begin_src emacs-lisp
+  (use-package compat
+    :ensure t)
+
+  (use-package elfeed
+    :ensure t
+    :config
+    (setq elfeed-search-feed-face ":foreground #ffffff :weight bold"
+          elfeed-feeds (quote
+                        (("https://www.reddit.com/r/linux.rss" reddit linux)))))
+
+  (use-package elfeed-goodies
+    :ensure t
+    :init
+    (elfeed-goodies/setup)
+    :config
+    (setq elfeed-goodies/entry-pane-size 0.5))
 #+end_src

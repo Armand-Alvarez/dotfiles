@@ -286,6 +286,9 @@ Disable backup files - since anything important I track with version control sys
 #+begin_src emacs-lisp
   (setq make-backup-files 0)
   (setq vc-make-backup-files 0)
+  (setq backup-directory-alist '((".*" . "~/.local/share/Trash/files")))
+
+
 #+end_src
 
 * Help

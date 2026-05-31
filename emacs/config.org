@@ -4,9 +4,7 @@
 
 * TABLE OF CONTENTS :toc:
 - [[#important-programs-to-load-first][Important Programs to Load First]]
-  - [[#add-scripts-dir-to-path][Add scripts dir to path]]
-  - [[#sourcing-the-scripts][Sourcing the scripts]]
-  - [[#use-package-support][Use-package Support]]
+  - [[#adding-the-scripts-directory-to-path][Adding the scripts directory to path]]
 - [[#editing][Editing]]
   - [[#evil][Evil]]
   - [[#company][Company]]
@@ -15,13 +13,11 @@
   - [[#dired][DIRED]]
   - [[#flycheck][Flycheck]]
   - [[#projectile][Projectile]]
-  - [[#keybinds][Keybinds]]
 - [[#gui][GUI]]
   - [[#theme][Theme]]
   - [[#line-numbers][Line Numbers]]
   - [[#fonts][Fonts]]
   - [[#all-the-icons][All the icons]]
-  - [[#buffer-move][Buffer Move]]
 - [[#file-management][File Management]]
   - [[#backups][Backups]]
 - [[#help][Help]]
@@ -37,72 +33,24 @@
   - [[#eshell][Eshell]]
   - [[#vterm][Vterm]]
 - [[#dashboard][Dashboard]]
+- [[#rss-reader][RSS Reader]]
 
 * Important Programs to Load First
 
-** Add scripts dir to path
+** Adding the scripts directory to path
 
 #+begin_src emacs-lisp
   (add-to-list 'load-path "~/.config/emacs/scripts/")
 #+end_src
 
-** Sourcing the scripts
-#+begin_src emacs-lisp
-  (require 'elpaca-setup)  ;; The Elpaca Package Manager
-  (require 'buffer-move)   ;; Buffer-move for better window management
-  (require 'app-launchers) ;; Use emacs as a run launcher like dmenu (experimental)
-#+end_src
+*** Sourcing the scripts
 
 #+begin_src emacs-lisp
-  (defvar elpaca-installer-version 0.12)
-  (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
-  (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
-  (defvar elpaca-sources-directory (expand-file-name "sources/" elpaca-directory))
-  (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                                :ref nil :depth 1 :inherit ignore
-                                :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                                :build (:not elpaca-activate)))
-  (let* ((repo  (expand-file-name "elpaca/" elpaca-sources-directory))
-         (build (expand-file-name "elpaca/" elpaca-builds-directory))
-         (order (cdr elpaca-order))
-         (default-directory repo))
-    (add-to-list 'load-path (if (file-exists-p build) build repo))
-    (unless (file-exists-p repo)
-      (make-directory repo t)
-      (when (<= emacs-major-version 28) (require 'subr-x))
-      (condition-case-unless-debug err
-          (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                    ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
-                                                    ,@(when-let* ((depth (plist-get order :depth)))
-                                                        (list (format "--depth=%d" depth) "--no-single-branch"))
-                                                    ,(plist-get order :repo) ,repo))))
-                    ((zerop (call-process "git" nil buffer t "checkout"
-                                          (or (plist-get order :ref) "--"))))
-                    (emacs (concat invocation-directory invocation-name))
-                    ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-                                          "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-                    ((require 'elpaca))
-                    ((elpaca-generate-autoloads "elpaca" repo)))
-              (progn (message "%s" (buffer-string)) (kill-buffer buffer))
-            (error "%s" (with-current-buffer buffer (buffer-string))))
-        ((error) (warn "%s" err) (delete-directory repo 'recursive))))
-    (unless (require 'elpaca-autoloads nil t)
-      (require 'elpaca)
-      (elpaca-generate-autoloads "elpaca" repo)
-      (let ((load-source-file-function nil)) (load "./elpaca-autoloads"))))
-  (add-hook 'after-init-hook #'elpaca-process-queues)
-  (elpaca `(,@elpaca-order))
+  (require 'buffer-move) ;; Buffer move script
+  (require 'elpaca-setup)  ;; The Elpaca Package manager
+  (require 'general-keybinds) ;; Keymappings that start with <SPC>
+  (require 'global-keybinds) ;; Global, non-space-prefixed keymappings
 #+end_src
-
-** Use-package Support
-
-#+begin_src emacs-lisp
-  ;; Install use-package support
-  (elpaca elpaca-use-package
-    ;; Enable use-package :ensure support for Elpaca.
-    (elpaca-use-package-mode))
-#+end_src
-
 
 * Editing
 
@@ -134,19 +82,21 @@ Text completion
 
 #+begin_src emacs-lisp
   (use-package company
+    :ensure t
     :defer 2
     :diminish
     :custom
     (company-begin-commands '(self-insert-command))
-    (company-idle-delay .1)
+    (company-idle-delay 0.1)
     (company-minimum-prefix-length 2)
     (company-show-numbers t)
-    (company-tooltip-align-annotations 't)
-    (global-company-mode t))
+    (company-tooltip-align-annotations t)
+    :config
+    (global-company-mode 1))
 
   (use-package company-box
-    :after company
     :ensure t
+    :after company
     :diminish
     :hook (company-mode . company-box-mode))
 
@@ -262,143 +212,6 @@ Interacting with projects
     (projectile-mode 1))
 #+end_src
 
-** Keybinds
-
-*** General
-
-General makes it easier to set keybindings
-
-#+begin_src emacs-lisp
-  (use-package general
-    :ensure t
-    :config
-    (general-evil-setup)
-    
-    ;; set up 'SPC' as the global leader key
-    (general-create-definer char/leader-keys
-      :states '(normal insert visual emacs)
-      :keymaps 'override
-      :prefix "SPC" ;; set leader
-      :global-prefix "M-SPC") ;; access leader in insert mode
-    
-    (char/leader-keys
-      "b"  '(:ignore t :wk "buffer")
-      "bb" '(switch-to-buffer :wk "Switch buffer")
-      "bk" '(kill-buffer :wk "Kill this buffer")
-      "bn" '(next-buffer :wk "Next buffer")
-      "bp" '(previous-buffer :wk "Previous buffer")
-      "br" '(revert-buffer :wk "Reload buffer")
-      "bm" '(buffer-menu :wk "Buffer menu"))
-
-    (char/leader-keys
-      "d" '(:ignore t wk "Dired")
-      "dd" '(dired :wk "Open dired")
-      "dj" '(dired-jump :wk "Dired jump to current")
-      "dn" '(neotree-dir :wk "Open directory in neotree")
-      "dp" '(peep-dired :wk "Peep-dired"))
-
-
-    (char/leader-keys
-      "!" '(:ignore t :wk "Flycheck")
-      "!n" '(flycheck-next-error :wk "Next error")
-      "!p" '(flycheck-previous-error :wk "Prev error")
-      "!l" '(flycheck-list-errors :wk "List errors")
-      "!S" '(flycheck-select-checker :wk "Select checker")
-      "!e" '(flycheck-explain-error-at-point :wk "Explain error"))
-
-    (char/leader-keys
-      "p" '(projectile-command-map :wk "Projectile"))
-
-    (char/leader-keys
-      "SPC" '(counsel-M-x :wk "Counsel M-x")
-      "TAB TAB" '(comment-line :wk "Comment lines"))
-
-    (char/leader-keys
-      "f"  '(:ignore t :wk "file")
-      "ff" '(find-file :wk "Find file")
-      "fc" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
-      "fr" '(counsel-recentf :wk "Find recent files"))
-
-    (char/leader-keys
-      "h"   '(:ignore t :wk "help")
-      "hh"  '(help-for-help :wk "Help for help")
-      "hf"  '(describe-function :wk "Describe function")
-      "hx"  '(describe-function :wk "Describe command")
-      "hv"  '(describe-variable :wk "Describe variable")
-      "hk"  '(describe-key :wk "Describe key")
-      "hc"  '(describe-key-briefly :wk "Describe key briefly")
-      "ho"  '(describe-symbol :wk "Describe symbol")
-      "hrr" '(reload-init-file :wk "Reload emacs config"))
-
-    (char/leader-keys
-      "m" '(:ignore t :wk "Org")
-      "m a" '(org-agenda :wk "Org agenda")
-      "m e" '(org-export-dispatch :wk "Org export dispatch")
-      "m i" '(org-toggle-item :wk "Org toggle item")
-      "m t" '(org-todo :wk "Org todo")
-      "m B" '(org-babel-tangle :wk "Org babel tangle")
-      "m T" '(org-todo-list :wk "Org todo list")
-      ;; Tables
-      "m b" '(:ignore t :wk "Tables")
-      "m b -" '(org-table-insert-hline :wk "Insert hline in table")
-      ;; Dates
-      "m d" '(:ignore t :wk "Date/deadline")
-      "m d t" '(org-time-stamp :wk "Org time stamp"))
-
-
-    (char/leader-keys
-      "e"  '(:ignore t :wk "Evaluate")    
-      "eb" '(eval-buffer :wk "Evaluate elisp in buffer")
-      "ed" '(eval-defun :wk "Evaluate defun containing or after point")
-      "ee" '(eval-expression :wk "Evaluate an elisp expression")
-      "el" '(eval-last-sexp :wk "Evaluate elisp expression before point")
-      "er" '(eval-region :wk "Evaluate elisp in region")) 
-
-    (char/leader-keys
-      "t" '(:ignore t :wk "Toggle")
-      "tl" '(display-line-numbers-mode :wk "Toggle line numbers")
-      "tn" '(neotree-toggle :wk "Toggle neotree")
-      "tt" '(vterm-toggle :wk "toggle vterm"))
-
-    (char/leader-keys
-      "w" '(:ignore t :wk "Windows")
-      ;; Window splits
-      "w q" '(evil-window-delete :wk "Close window")
-      "w Q" '(delete-other-windows :wk "Delete other windows")
-      "w n" '(evil-window-new :wk "New window")
-      "w s" '(evil-window-split :wk "Horizontal split window")
-      "w v" '(evil-window-vsplit :wk "Vertical split window")
-      "w i" '((lambda () (interactive) (enlarge-window 70) (enlarge-window-horizontally 70)) :wk "Enlarge window")
-      "w I" '(balance-windows :wk "Balance windows")
-      ;; Window motions
-      "w h" '(evil-window-left :wk "Window left")
-      "w j" '(evil-window-down :wk "Window down")
-      "w k" '(evil-window-up :wk "Window up")
-      "w l" '(evil-window-right :wk "Window right")
-      "w w" '(evil-window-next :wk "Goto next window")
-      ;; Move Windows
-      "w H" '(buf-move-left :wk "Buffer move left")
-      "w J" '(buf-move-down :wk "Buffer move down")
-      "w K" '(buf-move-up :wk "Buffer move up")
-      "w L" '(buf-move-right :wk "Buffer move right"))
-    )
-#+end_src
-
-*** Global keybinds
-
-**** Zooming 
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-=") 'text-scale-increase)
-  (global-set-key (kbd "C--") 'text-scale-decrease)
-  (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
-  (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
-#+end_src
-
-**** Follow links
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-c C-o") 'toc-org-follow-markdown-link)
-
-#+end_src
 * GUI
 
 ** Theme
@@ -463,81 +276,6 @@ Gives a bunch of icons to use in emacs
     :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
 #+end_src
 
-** Buffer Move
-
-Helper functions to move buffers around
-
-#+begin_src emacs-lisp
-    (require 'windmove)
-
-  ;;;###autoload
-  (defun buf-move-up ()
-    "Swap the current buffer and the buffer above the split.
-  If there is no split, ie now window above the current one, an
-  error is signaled."
-  ;;  "Switches between the current buffer, and the buffer above the
-  ;;  split, if possible."
-    (interactive)
-    (let* ((other-win (windmove-find-other-window 'up))
-  	 (buf-this-buf (window-buffer (selected-window))))
-      (if (null other-win)
-          (error "No window above this one")
-        ;; swap top with this one
-        (set-window-buffer (selected-window) (window-buffer other-win))
-        ;; move this one to top
-        (set-window-buffer other-win buf-this-buf)
-        (select-window other-win))))
-
-  ;;;###autoload
-  (defun buf-move-down ()
-  "Swap the current buffer and the buffer under the split.
-  If there is no split, ie now window under the current one, an
-  error is signaled."
-    (interactive)
-    (let* ((other-win (windmove-find-other-window 'down))
-  	 (buf-this-buf (window-buffer (selected-window))))
-      (if (or (null other-win) 
-              (string-match "^ \\*Minibuf" (buffer-name (window-buffer other-win))))
-          (error "No window under this one")
-        ;; swap top with this one
-        (set-window-buffer (selected-window) (window-buffer other-win))
-        ;; move this one to top
-        (set-window-buffer other-win buf-this-buf)
-        (select-window other-win))))
-
-  ;;;###autoload
-  (defun buf-move-left ()
-  "Swap the current buffer and the buffer on the left of the split.
-  If there is no split, ie now window on the left of the current
-  one, an error is signaled."
-    (interactive)
-    (let* ((other-win (windmove-find-other-window 'left))
-  	 (buf-this-buf (window-buffer (selected-window))))
-      (if (null other-win)
-          (error "No left split")
-        ;; swap top with this one
-        (set-window-buffer (selected-window) (window-buffer other-win))
-        ;; move this one to top
-        (set-window-buffer other-win buf-this-buf)
-        (select-window other-win))))
-
-  ;;;###autoload
-  (defun buf-move-right ()
-  "Swap the current buffer and the buffer on the right of the split.
-  If there is no split, ie now window on the right of the current
-  one, an error is signaled."
-    (interactive)
-    (let* ((other-win (windmove-find-other-window 'right))
-  	 (buf-this-buf (window-buffer (selected-window))))
-      (if (null other-win)
-          (error "No right split")
-        ;; swap top with this one
-        (set-window-buffer (selected-window) (window-buffer other-win))
-        ;; move this one to top
-        (set-window-buffer other-win buf-this-buf)
-        (select-window other-win))))
-
-#+end_src
 
 * File Management
 
@@ -547,6 +285,10 @@ Disable backup files - since anything important I track with version control sys
 
 #+begin_src emacs-lisp
   (setq make-backup-files 0)
+  (setq vc-make-backup-files 0)
+  (setq backup-directory-alist '((".*" . "~/.local/share/Trash/files")))
+
+
 #+end_src
 
 * Help
@@ -748,4 +490,26 @@ Extensible Emacs startup screen
                                       (bookmarks . "book")))
     :config
     (dashboard-setup-startup-hook))
+#+end_src
+
+
+* RSS Reader
+
+#+begin_src emacs-lisp
+  (use-package compat
+    :ensure t)
+
+  (use-package elfeed
+    :ensure t
+    :config
+    (setq elfeed-search-feed-face ":foreground #ffffff :weight bold"
+          elfeed-feeds (quote
+                        (("https://www.reddit.com/r/linux.rss" reddit linux)))))
+
+  (use-package elfeed-goodies
+    :ensure t
+    :init
+    (elfeed-goodies/setup)
+    :config
+    (setq elfeed-goodies/entry-pane-size 0.5))
 #+end_src
